@@ -106,6 +106,9 @@ export interface CertificateSummary {
   readonly daysUntilExpiry: number;
   readonly subjectAltNames: readonly string[];
   readonly keyBits?: number;
+  /** Key sizes are only comparable within an algorithm family. */
+  readonly keyType: 'rsa' | 'ec' | 'other';
+  readonly curve?: string;
 }
 
 export interface TlsEvidence {

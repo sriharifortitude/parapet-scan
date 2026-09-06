@@ -3,6 +3,8 @@ import type { Check, CertificateSummary, Evidence, FindingInput } from '../../ty
 const EXPIRY_WARNING_DAYS = 30;
 const EXPIRY_URGENT_DAYS = 7;
 const MIN_RSA_BITS = 2048;
+/** NIST SP 800-57 puts the floor for elliptic curve keys at 224 bits. */
+const MIN_EC_BITS = 224;
 
 const REFERENCE = {
   title: 'RFC 6125: Service identity in TLS',
@@ -115,15 +117,14 @@ export const tlsCertificateCheck: Check = {
       });
     }
 
-    if (certificate.keyBits !== undefined && certificate.keyBits < MIN_RSA_BITS) {
+    const weakKey = describeWeakKey(certificate);
+    if (weakKey !== undefined) {
       findings.push({
         id: 'tls/certificate/weak-key',
-        title: `Certificate public key is ${certificate.keyBits} bits`,
+        title: `Certificate public key is ${certificate.keyBits ?? '?'} bits`,
         severity: 'high',
         confidence: 'firm',
-        summary:
-          `A ${certificate.keyBits}-bit key is below the ${MIN_RSA_BITS}-bit floor that public ` +
-          'CAs and every current baseline require.',
+        summary: weakKey,
         evidence,
         remediation: 'Reissue with a 2048-bit or larger RSA key, or an ECDSA P-256 key.',
         references: [
@@ -138,6 +139,36 @@ export const tlsCertificateCheck: Check = {
     return findings;
   },
 };
+
+/**
+ * Key sizes are only comparable within an algorithm family. A 256-bit ECDSA key
+ * offers roughly the strength of a 3072-bit RSA key, so applying the RSA floor
+ * to every certificate would flag a modern P-256 deployment -- which is what
+ * most CAs now issue by default -- as a high-severity weakness.
+ */
+function describeWeakKey(certificate: CertificateSummary): string | undefined {
+  const bits = certificate.keyBits;
+  if (bits === undefined) return undefined;
+
+  if (certificate.keyType === 'rsa') {
+    return bits < MIN_RSA_BITS
+      ? `A ${bits}-bit RSA key is below the ${MIN_RSA_BITS}-bit floor that public CAs and ` +
+          'every current baseline require. Factoring effort against keys this size is within ' +
+          'reach of a well-resourced attacker.'
+      : undefined;
+  }
+
+  if (certificate.keyType === 'ec') {
+    return bits < MIN_EC_BITS
+      ? `A ${bits}-bit elliptic curve key (${certificate.curve ?? 'unnamed curve'}) is below ` +
+          `the ${MIN_EC_BITS}-bit minimum. Note that EC key sizes are not comparable to RSA: ` +
+          '256 bits here is the common, and adequate, choice.'
+      : undefined;
+  }
+
+  // An unrecognised algorithm is not evidence of weakness, so it is not reported.
+  return undefined;
+}
 
 function isSelfSigned(certificate: CertificateSummary): boolean {
   return (

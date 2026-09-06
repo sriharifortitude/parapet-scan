@@ -148,6 +148,7 @@ function isPopulated(certificate: PeerCertificate): boolean {
 }
 
 function summarise(certificate: PeerCertificate): CertificateSummary {
+  const curve = curveOf(certificate);
   const validTo = new Date(certificate.valid_to);
   const msPerDay = 86_400_000;
   const daysUntilExpiry = Math.floor((validTo.getTime() - Date.now()) / msPerDay);
@@ -160,7 +161,25 @@ function summarise(certificate: PeerCertificate): CertificateSummary {
     daysUntilExpiry: Number.isFinite(daysUntilExpiry) ? daysUntilExpiry : 0,
     subjectAltNames: parseSubjectAltNames(certificate.subjectaltname),
     ...(typeof certificate.bits === 'number' ? { keyBits: certificate.bits } : {}),
+    keyType: keyTypeOf(certificate),
+    ...(curve === undefined ? {} : { curve }),
   };
+}
+
+/**
+ * OpenSSL populates modulus/exponent for RSA keys and a curve name for EC keys,
+ * so the algorithm is inferred from which fields are present rather than parsed
+ * out of the DER.
+ */
+function keyTypeOf(certificate: PeerCertificate): 'rsa' | 'ec' | 'other' {
+  if (typeof certificate.modulus === 'string' && certificate.modulus !== '') return 'rsa';
+  if (curveOf(certificate) !== undefined) return 'ec';
+  return 'other';
+}
+
+function curveOf(certificate: PeerCertificate): string | undefined {
+  const curve = certificate.nistCurve ?? certificate.asn1Curve;
+  return typeof curve === 'string' && curve !== '' ? curve : undefined;
 }
 
 function formatName(name: PeerCertificate['subject'] | undefined): string {
