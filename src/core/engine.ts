@@ -171,7 +171,7 @@ function orderCollectors(needed: ReadonlySet<CollectorId>): Collector[] {
     const collector = collectorById(id);
     for (const dependency of collector.dependsOn) visit(dependency, [...path, id]);
     state.set(id, 'done');
-    ordered.push(collector as Collector);
+    ordered.push(collector);
   };
 
   // Iterating COLLECTORS rather than the set keeps the order deterministic.
