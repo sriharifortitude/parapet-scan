@@ -1,0 +1,19 @@
+node_modules/
+dist/
+coverage/
+
+# Scan output. Reports can embed response bodies from the target under test,
+# so they are never committed.
+*.bastion.json
+*.bastion.sarif
+*.bastion.html
+reports/
+
+.env
+.env.*
+!.env.example
+
+.DS_Store
+Thumbs.db
+*.log
+.vitest/
