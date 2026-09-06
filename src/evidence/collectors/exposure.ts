@@ -52,15 +52,18 @@ const SIGNATURES: readonly Signature[] = [
     name: 'phpinfo output',
     matches: (body) => /phpinfo\(\)/.test(body) || /PHP Version\s*</i.test(body),
   },
-  {
-    path: '/.well-known/../.env',
-    name: 'dotenv file via path traversal',
-    matches: (body, contentType) =>
-      !/html/i.test(contentType) && /^[A-Z][A-Z0-9_]*=/m.test(body),
-  },
 ];
 
 const MAX_EXCERPT = 220;
+
+/**
+ * Path traversal is deliberately not probed here. The WHATWG URL parser
+ * resolves `/.well-known/../.env` to `/.env` before the request is built, and
+ * it decodes `%2e%2e` to the same thing, so a traversal signature written this
+ * way silently re-requests the plain path and reports a second finding for one
+ * weakness. Testing it honestly means bypassing the URL parser to write a raw
+ * request target, which is more machinery than the finding earns.
+ */
 
 /**
  * Requests a fixed list of paths that should never be publicly readable, plus
