@@ -160,12 +160,20 @@ function describe(probe: CorsProbe): Evidence[] {
   ];
 }
 
-/** The arbitrary-origin and preflight probes often produce the same verdict. */
+/**
+ * An origin that reflects on a simple GET almost always reflects on the
+ * preflight too, and reporting both states one weakness twice. The preflight
+ * result is kept only when it is telling us something the GET did not.
+ */
 function dedupe(findings: readonly FindingInput[]): FindingInput[] {
   const seen = new Set<string>();
-  return findings.filter((finding) => {
+  const unique = findings.filter((finding) => {
     if (seen.has(finding.id)) return false;
     seen.add(finding.id);
     return true;
   });
+
+  return seen.has('cors/misconfiguration/reflects-origin')
+    ? unique.filter((finding) => finding.id !== 'cors/misconfiguration/preflight-reflects-origin')
+    : unique;
 }

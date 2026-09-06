@@ -9,7 +9,6 @@ const SEVERITY_BY_SIGNATURE: Readonly<Record<string, Severity>> = {
   'git HEAD file': 'high',
   'git config file': 'high',
   'dotenv file': 'critical',
-  'dotenv file via path traversal': 'critical',
   'subversion entries file': 'high',
   'macOS directory index': 'low',
   'Apache mod_status page': 'medium',
@@ -27,10 +26,6 @@ const IMPACT_BY_SIGNATURE: Readonly<Record<string, string>> = {
   'dotenv file':
     'Environment files hold database credentials, API keys and signing secrets in plaintext. ' +
     'Treat every value in the retrieved file as compromised.',
-  'dotenv file via path traversal':
-    'The environment file was reachable through a traversal sequence, which means the server ' +
-    'normalises paths after applying its access rules. Other deny rules are likely bypassable ' +
-    'the same way.',
   'subversion entries file':
     'The .svn metadata allows reconstruction of the working copy, including files not intended ' +
     'to be served.',
