@@ -106,7 +106,6 @@ export interface CertificateSummary {
   readonly daysUntilExpiry: number;
   readonly subjectAltNames: readonly string[];
   readonly keyBits?: number;
-  readonly signatureAlgorithm?: string;
 }
 
 export interface TlsEvidence {
@@ -291,3 +290,6 @@ export interface ScanReport {
   readonly results: readonly TargetResult[];
   readonly summary: Readonly<Record<Severity, number>>;
 }
+
+/** Discriminated union over every collector, so a registry can hold them together. */
+export type AnyCollector = { [K in CollectorId]: Collector<K> }[CollectorId];
