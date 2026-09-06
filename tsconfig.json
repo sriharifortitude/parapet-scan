@@ -22,5 +22,5 @@
     "forceConsistentCasingInFileNames": true,
     "isolatedModules": true
   },
-  "include": ["src", "tests", "vitest.config.ts", "eslint.config.js"]
+  "include": ["src", "tests", "vitest.config.ts", "vitest.integration.config.ts", "eslint.config.js"]
 }
