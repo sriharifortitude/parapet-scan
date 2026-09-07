@@ -124,7 +124,7 @@ describe('scanning the vulnerable endpoint', () => {
 
   it('renders the findings to HTML without unescaped markup from the target', () => {
     const html = toHtml({
-      tool: { name: 'bastion-scan', version: 'test' },
+      tool: { name: 'parapet-scan', version: 'test' },
       startedAt: new Date().toISOString(),
       finishedAt: new Date().toISOString(),
       results: [result],

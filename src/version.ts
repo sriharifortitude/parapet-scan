@@ -14,5 +14,5 @@ const manifest = createRequire(import.meta.url)('../package.json') as PackageMan
 
 export const TOOL_NAME = manifest.name;
 export const TOOL_VERSION = manifest.version;
-export const TOOL_URL = 'https://github.com/sriharifortitude/bastion-scan';
+export const TOOL_URL = 'https://github.com/sriharifortitude/parapet-scan';
 export const USER_AGENT = `${TOOL_NAME}/${TOOL_VERSION} (+${TOOL_URL})`;

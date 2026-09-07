@@ -24,11 +24,11 @@ export const corsCollector: Collector<'cors'> = {
     const host = ctx.target.hostname;
 
     const cases: ReadonlyArray<{ origin: string; label: CorsProbe['label']; method: string }> = [
-      { origin: 'https://bastion-probe.invalid', label: 'arbitrary', method: 'GET' },
+      { origin: 'https://parapet-probe.invalid', label: 'arbitrary', method: 'GET' },
       { origin: 'null', label: 'null', method: 'GET' },
       // Catches allowlists implemented with a prefix or substring match.
-      { origin: `https://${host}.bastion-probe.invalid`, label: 'subdomain-suffix', method: 'GET' },
-      { origin: 'https://bastion-probe.invalid', label: 'preflight', method: 'OPTIONS' },
+      { origin: `https://${host}.parapet-probe.invalid`, label: 'subdomain-suffix', method: 'GET' },
+      { origin: 'https://parapet-probe.invalid', label: 'preflight', method: 'OPTIONS' },
     ];
 
     const probes: CorsProbe[] = [];

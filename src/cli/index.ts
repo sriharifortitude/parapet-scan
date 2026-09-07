@@ -2,7 +2,7 @@
 import { Command, InvalidArgumentError, Option } from 'commander';
 
 import { CHECKS } from '../checks/index.js';
-import { BastionError, describeError } from '../core/errors.js';
+import { ParapetError, describeError } from '../core/errors.js';
 import { TOOL_NAME, TOOL_VERSION } from '../version.js';
 import { runScan, type OutputFormat } from './commands/scan.js';
 import type { Category, Severity } from '../types.js';
@@ -12,7 +12,7 @@ const CATEGORIES = ['headers', 'cookies', 'cors', 'tls', 'disclosure', 'content'
 const program = new Command();
 
 program
-  .name('bastion')
+  .name('parapet')
   .description(
     'Audits the externally observable security posture of a web application.\n\n' +
       'Only scan systems you own or have written permission to test.',
@@ -23,7 +23,7 @@ program
   .command('scan', { isDefault: true })
   .description('Scan one or more targets')
   .argument('[targets...]', 'URLs or hostnames to scan')
-  .option('-c, --config <path>', 'path to a bastion.yml configuration file')
+  .option('-c, --config <path>', 'path to a parapet.yml configuration file')
   .addOption(
     new Option('-f, --format <format>', 'output format')
       .choices(['terminal', 'json', 'sarif', 'html'])
@@ -101,7 +101,7 @@ try {
   await program.parseAsync(process.argv);
 } catch (error) {
   process.stderr.write(`${TOOL_NAME}: ${describeError(error)}\n`);
-  if (error instanceof BastionError && error.hint !== undefined) {
+  if (error instanceof ParapetError && error.hint !== undefined) {
     process.stderr.write(`  ${error.hint}\n`);
   }
   process.exitCode = 2;

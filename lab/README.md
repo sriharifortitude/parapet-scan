@@ -12,7 +12,7 @@ third-party site to demonstrate that it works.
 
 ```
 npm run lab:up
-npx bastion scan http://127.0.0.1:8080 --allow-private
+npx parapet scan http://127.0.0.1:8080 --allow-private
 npm run lab:down
 ```
 

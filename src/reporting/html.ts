@@ -10,7 +10,7 @@ import type { Evidence, Finding, ScanReport, Severity, TargetResult } from '../t
  * definition. Every interpolation goes through escapeHtml, and there is no path
  * that writes raw markup into the document. A scanner that reports on injection
  * flaws by producing a page vulnerable to injection would be an embarrassment,
- * and tests/unit/reporting-html.test.ts asserts the escaping directly.
+ * and tests/unit/reporting.test.ts asserts the escaping directly.
  */
 export function toHtml(report: ScanReport): string {
   const generated = new Date(report.finishedAt).toISOString().replace('T', ' ').slice(0, 19);

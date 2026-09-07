@@ -7,7 +7,7 @@ import { ConfigError } from '../core/errors.js';
 import { DEFAULTS, DEFAULT_USER_AGENT, configFileSchema, type ConfigFile } from './schema.js';
 import type { Category, ResolvedConfig, Severity } from '../types.js';
 
-const CANDIDATE_FILENAMES = ['bastion.yml', 'bastion.yaml'] as const;
+const CANDIDATE_FILENAMES = ['parapet.yml', 'parapet.yaml'] as const;
 
 export interface CliOverrides {
   readonly targets?: readonly string[];
@@ -38,7 +38,7 @@ export async function loadConfig(
   if (targets.length === 0) {
     throw new ConfigError(
       'No target was given.',
-      'Pass a URL as an argument, or list targets in bastion.yml.',
+      'Pass a URL as an argument, or list targets in parapet.yml.',
     );
   }
 
