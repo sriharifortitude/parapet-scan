@@ -84,7 +84,10 @@ jobs:
       - name: Check the SARIF output parses and carries results
         run: |
           node -e "
-            const sarif = require('./reports/lab.sarif');
+            // require() treats an unknown extension as JavaScript, so the
+            // file is read and parsed explicitly.
+            const { readFileSync } = require('node:fs');
+            const sarif = JSON.parse(readFileSync('./reports/lab.sarif', 'utf8'));
             if (sarif.version !== '2.1.0') throw new Error('unexpected SARIF version');
             const results = sarif.runs[0].results;
             if (results.length === 0) throw new Error('SARIF contained no results');
