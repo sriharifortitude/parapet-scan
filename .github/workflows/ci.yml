@@ -1,0 +1,108 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+# The default token needs nothing beyond reading the repository.
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    name: Typecheck, lint and unit tests
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        # 20.11 is the documented floor; 22 is what most users will run.
+        node: ['20.11', '22']
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+          cache: npm
+
+      - run: npm ci
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Unit tests
+        run: npm test
+
+      - name: Build
+        run: npm run build
+
+      # The published package exposes a bin entry; a build that produces one
+      # that cannot start is a broken release, and this is the cheapest way to
+      # catch it.
+      - name: Smoke-test the built CLI
+        run: node dist/cli/index.js checks
+
+  integration:
+    name: Integration tests against the lab
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      - run: npm ci
+
+      - name: Start the lab target
+        run: npm run lab:up
+
+      - name: Integration tests
+        run: npm run test:integration
+
+      # Produces the reports a reviewer can download from the run, and proves
+      # the reporters work end to end rather than only in unit tests.
+      - name: Generate example reports
+        run: |
+          npx tsx src/cli/index.ts scan http://127.0.0.1:8080 \
+            --allow-private --fail-on never --format html --output reports/lab.html
+          npx tsx src/cli/index.ts scan http://127.0.0.1:8080 \
+            --allow-private --fail-on never --format sarif --output reports/lab.sarif
+          npx tsx src/cli/index.ts scan http://127.0.0.1:8080 \
+            --allow-private --fail-on never --format json --output reports/lab.json
+
+      - name: Check the SARIF output parses and carries results
+        run: |
+          node -e "
+            const sarif = require('./reports/lab.sarif');
+            if (sarif.version !== '2.1.0') throw new Error('unexpected SARIF version');
+            const results = sarif.runs[0].results;
+            if (results.length === 0) throw new Error('SARIF contained no results');
+            const ruleIds = new Set(sarif.runs[0].tool.driver.rules.map(r => r.id));
+            for (const result of results) {
+              if (!ruleIds.has(result.ruleId)) {
+                throw new Error('result references an undeclared rule: ' + result.ruleId);
+              }
+            }
+            console.log(results.length + ' SARIF results, all rules declared');
+          "
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: lab-reports
+          path: reports/
+          retention-days: 7
+
+      - name: Stop the lab target
+        if: always()
+        run: npm run lab:down
