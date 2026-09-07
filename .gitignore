@@ -4,9 +4,9 @@ coverage/
 
 # Scan output. Reports can embed response bodies from the target under test,
 # so they are never committed.
-*.bastion.json
-*.bastion.sarif
-*.bastion.html
+*.parapet.json
+*.parapet.sarif
+*.parapet.html
 reports/
 
 .env

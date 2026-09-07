@@ -41,7 +41,7 @@ export function makeResponse(
 export function makeConfig(overrides: Partial<ResolvedConfig> = {}): ResolvedConfig {
   return {
     targets: ['https://target.test/'],
-    userAgent: 'bastion-scan/test',
+    userAgent: 'parapet-scan/test',
     timeoutMs: DEFAULTS.timeoutMs,
     concurrency: DEFAULTS.concurrency,
     requestDelayMs: 0,

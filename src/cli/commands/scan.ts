@@ -3,7 +3,7 @@ import { dirname } from 'node:path';
 
 import { loadConfig } from '../../config/load.js';
 import { scanTarget } from '../../core/engine.js';
-import { BastionError, describeError } from '../../core/errors.js';
+import { ParapetError, describeError } from '../../core/errors.js';
 import { meetsThreshold } from '../../core/severity.js';
 import { selectChecks } from '../../checks/index.js';
 import { redactFinding } from '../../reporting/redact.js';
@@ -62,7 +62,7 @@ export async function runScan(targets: readonly string[], options: ScanCommandOp
     categories: config.categories,
   });
   if (checks.length === 0) {
-    throw new BastionError(
+    throw new ParapetError(
       'Every check was filtered out.',
       'Check the --category and --disable arguments.',
     );
@@ -85,7 +85,7 @@ export async function runScan(targets: readonly string[], options: ScanCommandOp
     } catch (error) {
       hardFailure = true;
       process.stderr.write(`${TOOL_NAME}: ${target}: ${describeError(error)}\n`);
-      if (error instanceof BastionError && error.hint !== undefined) {
+      if (error instanceof ParapetError && error.hint !== undefined) {
         process.stderr.write(`  ${error.hint}\n`);
       }
     }
@@ -121,7 +121,7 @@ async function emit(
     options.format === 'json'
       ? toJson(report)
       : options.format === 'sarif'
-        ? toSarif(report, checks, options.config ?? 'bastion.yml')
+        ? toSarif(report, checks, options.config ?? 'parapet.yml')
         : options.format === 'html'
           ? toHtml(report)
           : renderTerminal(report, {
@@ -146,7 +146,7 @@ function parseHeaders(entries: readonly string[]): Record<string, string> {
   for (const entry of entries) {
     const separator = entry.indexOf(':');
     if (separator <= 0) {
-      throw new BastionError(
+      throw new ParapetError(
         `Could not parse --header "${entry}".`,
         'Use the form --header "Name: value".',
       );

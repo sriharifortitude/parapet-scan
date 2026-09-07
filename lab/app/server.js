@@ -1,7 +1,7 @@
 'use strict';
 
 /**
- * Deliberately misconfigured target for testing bastion-scan.
+ * Deliberately misconfigured target for testing parapet-scan.
  *
  * This server exists to produce findings. Every weakness below is intentional
  * and is asserted by tests/integration. It listens on loopback inside a

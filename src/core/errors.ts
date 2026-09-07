@@ -1,5 +1,5 @@
 /** Base class so the CLI can distinguish expected failures from real crashes. */
-export class BastionError extends Error {
+export class ParapetError extends Error {
   constructor(
     message: string,
     readonly hint?: string,
@@ -10,13 +10,13 @@ export class BastionError extends Error {
 }
 
 /** The target was rejected before any request was sent. */
-export class TargetRejectedError extends BastionError {}
+export class TargetRejectedError extends ParapetError {}
 
 /** Configuration file or CLI flags were invalid. */
-export class ConfigError extends BastionError {}
+export class ConfigError extends ParapetError {}
 
 /** The run exceeded its request budget. */
-export class RequestBudgetError extends BastionError {}
+export class RequestBudgetError extends ParapetError {}
 
 export function describeError(error: unknown): string {
   if (error instanceof Error) {

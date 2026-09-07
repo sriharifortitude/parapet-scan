@@ -25,7 +25,7 @@ function finding(overrides: Partial<Finding> = {}): Finding {
 
 function report(findings: Finding[]): ScanReport {
   return {
-    tool: { name: 'bastion-scan', version: '0.1.0' },
+    tool: { name: 'parapet-scan', version: '0.1.0' },
     startedAt: '2026-01-01T00:00:00.000Z',
     finishedAt: '2026-01-01T00:00:05.000Z',
     results: [
@@ -164,7 +164,7 @@ describe('toSarif', () => {
   ];
 
   it('emits a valid 2.1.0 envelope with the rule and result linked', () => {
-    const parsed = JSON.parse(toSarif(report([finding()]), checks, 'bastion.yml')) as {
+    const parsed = JSON.parse(toSarif(report([finding()]), checks, 'parapet.yml')) as {
       version: string;
       runs: Array<{
         tool: { driver: { rules: Array<{ id: string }> } };
@@ -177,14 +177,14 @@ describe('toSarif', () => {
     expect(parsed.runs[0]!.results[0]!.ruleId).toBe('headers/csp');
     expect(parsed.runs[0]!.results[0]!.level).toBe('warning');
     expect(parsed.runs[0]!.results[0]!.partialFingerprints).toEqual({
-      bastionFindingId: 'https://target.test/|headers/csp/missing',
+      parapetFindingId: 'https://target.test/|headers/csp/missing',
     });
   });
 
   // A result whose ruleId is not in the rules array is rejected by consumers.
   it('omits results whose check is not in the rule set', () => {
     const parsed = JSON.parse(
-      toSarif(report([finding({ checkId: 'not/registered' })]), checks, 'bastion.yml'),
+      toSarif(report([finding({ checkId: 'not/registered' })]), checks, 'parapet.yml'),
     ) as { runs: Array<{ results: unknown[] }> };
     expect(parsed.runs[0]!.results).toEqual([]);
   });

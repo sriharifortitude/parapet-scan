@@ -71,7 +71,7 @@ function toResult(finding: Finding, anchorPath: string): unknown {
     ],
     // Stable across runs so code scanning can track a finding rather than
     // reporting it as new every time the scan runs.
-    partialFingerprints: { bastionFindingId: `${finding.target}|${finding.id}` },
+    partialFingerprints: { parapetFindingId: `${finding.target}|${finding.id}` },
     properties: {
       severity: finding.severity,
       confidence: finding.confidence,
