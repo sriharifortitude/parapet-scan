@@ -1,0 +1,66 @@
+# Copy to parapet.yml. Every key is optional; the defaults are shown.
+# Unknown keys are rejected rather than ignored, so a typo fails the run
+# instead of silently disabling a setting.
+
+targets:
+  - https://example.com
+
+# Request behaviour. The defaults are deliberately gentle: a scan should not
+# look like an attack in the target's own access logs.
+concurrency: 4
+requestDelayMs: 100
+timeoutMs: 10000
+
+# Hard ceiling on requests for the whole run. The scan aborts rather than
+# exceeding it.
+maxRequests: 80
+
+# Bytes read from any single response before the read is abandoned. Response
+# bodies are attacker-controlled, so this is a limit, not a buffer size.
+maxBodyBytes: 1048576
+
+# Exit 1 when a finding at this severity or above is reported.
+# One of: critical | high | medium | low | info | never
+failOn: high
+
+# Requests for a fixed list of paths that should never be readable
+# (/.git/HEAD, /.env, ...). Set false for a first pass against production if you
+# would rather not request files that do not exist.
+probeExposedPaths: true
+
+# Permit targets that resolve into reserved address ranges. Required for the
+# bundled lab. See docs/adr/0003-scope-guard.md before turning this on.
+allowPrivateTargets: false
+
+# Limit the run to these categories. Omit or leave empty to run everything.
+# One or more of: headers | cookies | cors | tls | disclosure | content
+categories: []
+
+# Check ids to skip entirely. `npx parapet checks` lists them.
+disabledChecks: []
+#  - content/target-blank
+
+# Accepted risk. These *finding* ids are still evaluated and still appear in the
+# report under `suppressed`, but they do not count toward failOn.
+#
+# Note this takes finding ids (headers/csp/missing), not check ids
+# (headers/csp) -- so accepting one finding does not silence the whole check.
+baseline: []
+#  - disclosure/server-banner/versioned
+#  - headers/permissions-policy/missing
+
+# Sent on every request. Use this for authenticated scans; cookies set only
+# after login are invisible to an anonymous scan.
+#
+# Do not commit real credentials. Keep them in an environment variable and pass
+# them with --header at run time instead.
+headers: {}
+#  Authorization: "Bearer ..."
+
+# Header values replaced with <redacted> before any report is written.
+redactHeaders:
+  - authorization
+  - cookie
+  - set-cookie
+  - proxy-authorization
+  - x-api-key
