@@ -1,5 +1,7 @@
 # parapet-scan
 
+[![CI](https://github.com/sriharifortitude/parapet-scan/actions/workflows/ci.yml/badge.svg)](https://github.com/sriharifortitude/parapet-scan/actions/workflows/ci.yml)
+
 Audits the security posture a web application exposes to the internet — headers,
 TLS, cookies, CORS, information disclosure and content integrity — and reports
 what is wrong, why it matters, and how to fix it.
