@@ -288,14 +288,14 @@ accepting one finding does not silence a whole check.
 ```yaml
 - name: Security posture scan
   run: |
-    docker run --rm ghcr.io/sriharifortitude/parapet-scan:latest       scan https://staging.example.com --fail-on high
+    docker run --rm ghcr.io/sriharifortitude/parapet-scan:0.1 \n      scan https://staging.example.com --fail-on high
 ```
 
 Or upload SARIF so findings appear in the GitHub Security tab:
 
 ```yaml
 - run: |
-    docker run --rm -v "$PWD:/out" ghcr.io/sriharifortitude/parapet-scan:latest       scan https://staging.example.com --format sarif --output /out/parapet.sarif --fail-on never
+    docker run --rm -v "$PWD:/out" ghcr.io/sriharifortitude/parapet-scan:0.1 \n      scan https://staging.example.com --format sarif --output /out/parapet.sarif --fail-on never
 - uses: github/codeql-action/upload-sarif@v3
   with:
     sarif_file: parapet.sarif
