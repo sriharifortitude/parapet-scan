@@ -1,6 +1,6 @@
 {
   "name": "parapet-scan",
-  "version": "0.1.0",
+  "version": "0.1.2",
   "description": "Audits the externally observable security posture of a web application: headers, TLS, cookies, CORS, information disclosure and content integrity.",
   "type": "module",
   "engines": {
